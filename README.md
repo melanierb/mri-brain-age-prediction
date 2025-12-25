@@ -1,65 +1,73 @@
-# Predicting Brain Age from MRI-Derived Features
-This project addresses the task of predicting a person’s chronological age from MRI-derived brain features. The dataset consists of high-dimensional anatomical measurements extracted from structural MRI scans.
+# 🧠 Predicting Brain Age from MRI-Derived Features
 
-The focus of this project is robust preprocessing and reproducible modeling for noisy biomedical tabular data, rather than aggressive model tuning.
+This project addresses the task of predicting a person’s **chronological age** from **MRI-derived brain features**.  
+The dataset consists of high-dimensional anatomical measurements extracted from structural MRI scans.
+
+---
 
 ## Dataset
-- ~800 anatomical features derived from MRI brain scans
-- Tabular (CSV) format, pre-extracted using neuroimaging pipelines
+
+- ~800 anatomical features derived from MRI brain scans  
+- Tabular (CSV) format, pre-extracted using neuroimaging pipelines  
 - Common challenges:
-    - Missing values
-    - Outliers / extreme measurements
-    - Irrelevant or redundant features
-The raw imaging data is not included in this repository.
+  - Missing values  
+  - Outliers and extreme measurements  
+  - Irrelevant or redundant features  
 
-# Approach
-The pipeline closely mirrors an exploratory notebook workflow and is implemented as a reproducible training script.
+> ⚠️ The raw imaging data is **not included** in this repository.
 
-1. Missing Value Handling
-Missing values are imputed using median imputation, which is robust to skewed feature distributions commonly found in biomedical data.
+---
 
-2. Outlier Handling
-Outliers are detected using IsolationForest
+## Approach
 
-3. Feature Selection
-To reduce dimensionality and remove irrelevant features:
+The pipeline closely mirrors an **exploratory notebook workflow** and is implemented as a **reproducible training script**.  
+All preprocessing steps that affect training are fitted on the training data only and reapplied consistently.
 
-A Random Forest regressor is trained on the preprocessed training data
+### 1. Missing Value Handling
 
-Feature importance scores are used to select informative features
+Missing values are imputed using **median imputation**, which is robust to skewed and heavy-tailed feature distributions commonly observed in biomedical data.
 
-By default, features with importance above the median are retained
-(alternatively, a top-K selection can be used)
+---
 
-This step improves robustness and mitigates overfitting in high-dimensional,
-noisy settings.
+### 2. Outlier Handling
 
-4. Regression Model
+Outliers are detected using **IsolationForest**, applied **only to the training data**.
 
-The final model is a Histogram-based Gradient Boosting Regressor
-(HistGradientBoostingRegressor), chosen for:
+- Designed to identify atypical feature patterns  
+- Helps reduce the influence of extraction artifacts or corrupted measurements  
+- Validation and test samples are *not* filtered to avoid information leakage  
 
-Good performance on tabular data
+---
 
-Robustness to non-linear relationships
+### 3. Feature Selection
 
-Efficient training on medium-sized datasets
+To reduce dimensionality and remove irrelevant features, a **combined feature ranking** strategy is used:
 
-Evaluation
+- **Univariate statistical testing** using `SelectKBest` with `f_regression`  
+- **Tree-based feature importance** using a `RandomForestRegressor`  
+- Both scores are min-max normalized and averaged into a **combined score**  
+- The **top 150 features** are retained  
 
-Metric: Coefficient of determination (R²)
+This approach balances:
+- individual feature–target correlation  
+- multivariate, non-linear importance captured by tree models  
 
-A train/validation split is used for local evaluation
+It improves robustness and mitigates overfitting in high-dimensional, noisy settings.
 
-Final metrics are written to outputs/metrics.json
-- R^2
+---
 
-# Getting started
-python3 -m venv aml  
+### 4. Regression Model
 
-source aml/bin/activate
+The final model is a **Histogram-based Gradient Boosting Regressor** (`HistGradientBoostingRegressor`), chosen for:
 
-pip install -r requirements.txt
+- Strong performance on tabular data  
+- Robustness to non-linear relationships  
+- Efficient training on medium-sized datasets  
 
-### Run code
-python -m train --data-dir data --out-dir outputs
+---
+
+## Evaluation
+
+- **Metric:** Coefficient of determination (R²)  
+- A **train/validation split** is used for local evaluation  
+- Final evaluation metrics are written to:
