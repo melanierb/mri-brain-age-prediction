@@ -1,0 +1,10 @@
+{
+  "r2": 0.495400370654015,
+  "mae": 4.9135240275537075,
+  "n_train": 872,
+  "n_val": 243,
+  "n_features_total": 832,
+  "n_features_selected": 150,
+  "model": "HistGradientBoostingRegressor",
+  "seed": 42
+}
