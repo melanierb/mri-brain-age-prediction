@@ -27,7 +27,6 @@ All preprocessing steps that affect training are fitted on the training data onl
 
 Missing values are imputed using **median imputation**, which is robust to skewed and heavy-tailed feature distributions commonly observed in biomedical data.
 
----
 
 ### 2. Outlier Handling
 
@@ -37,7 +36,6 @@ Outliers are detected using **IsolationForest**, applied **only to the training 
 - Helps reduce the influence of extraction artifacts or corrupted measurements  
 - Validation and test samples are *not* filtered to avoid information leakage  
 
----
 
 ### 3. Feature Selection
 
@@ -54,7 +52,6 @@ This approach balances:
 
 It improves robustness and mitigates overfitting in high-dimensional, noisy settings.
 
----
 
 ### 4. Regression Model
 
@@ -71,3 +68,20 @@ The final model is a **Histogram-based Gradient Boosting Regressor** (`HistGradi
 - **Metric:** Coefficient of determination (R²)  
 - A **train/validation split** is used for local evaluation  
 - Final evaluation metrics are written to:
+
+---
+
+## Getting Started
+
+### Environment setup
+
+```bash
+python3 -m venv aml
+source aml/bin/activate
+pip install -r requirements.txt
+```
+
+### Run the full piepline using
+```bash
+python -m train --data-dir data --out-dir outputs
+```
